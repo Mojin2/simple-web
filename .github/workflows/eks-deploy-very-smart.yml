@@ -61,7 +61,17 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -am "Update image tag to ${{ env.DOCKER_TAG }}"
-          git remote set-url origin https://${{ secrets.PAT }}@github.com/${{ secrets.DOCKER_USERNAME }}/simple-service.git
+          # 모든 변경사항 (tracked/untracked)을 스테이징에 추가
+          git add .
 
-          git push origin main
+          # 변경사항이 있는지 확인하고, 있다면 커밋 및 푸시
+          # git diff-index --quiet HEAD는 변경사항이 없으면 0을 반환, 있으면 1을 반환
+          # '||' (OR 연산자)는 이전 명령이 실패(exit code 1)했을 때만 다음 명령을 실행
+          if ! git diff-index --quiet HEAD; then
+            echo "Changes detected, committing and pushing..."
+            git commit -m "Update image tag to ${{ env.DOCKER_TAG }}"
+            git remote set-url origin https://${{ secrets.PAT }}@github.com/${{ github.repositoryOwner }}/simple-service.git
+            git push origin main
+          else
+            echo "No changes to commit, skipping commit and push."
+          fi
