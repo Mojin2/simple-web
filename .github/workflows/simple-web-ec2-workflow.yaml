@@ -1,4 +1,5 @@
-name: Deploy Simple-Web to AWS EC2 using AWS CLI
+## .github/workflows/ec2-deploy-tough.yml
+name: simple-web-ec2-deploy-tough
 on:
   push:
     branches:
